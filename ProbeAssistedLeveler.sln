@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProbeAssistedLeveler", "ProbeAssistedLeveler\ProbeAssistedLeveler.csproj", "{FBF11A43-2D22-413A-B482-A50F552A7B60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{05ED6CF5-2995-484E-B356-2649B537E378}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FBF11A43-2D22-413A-B482-A50F552A7B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF11A43-2D22-413A-B482-A50F552A7B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF11A43-2D22-413A-B482-A50F552A7B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF11A43-2D22-413A-B482-A50F552A7B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05ED6CF5-2995-484E-B356-2649B537E378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05ED6CF5-2995-484E-B356-2649B537E378}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05ED6CF5-2995-484E-B356-2649B537E378}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05ED6CF5-2995-484E-B356-2649B537E378}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE50B844-1EA8-400B-A951-9D5CDDED2BBD}
+	EndGlobalSection
+EndGlobal
