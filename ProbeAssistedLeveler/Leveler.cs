@@ -110,8 +110,8 @@ namespace ProbeAssistedLeveler
                         diff = GetDiffAsInt(currentHeight, - baseZHeight);
                         if (_commandSender.IsProbeTriggered())
                         {
-                            Console.WriteLine("TOO LOW! PULL UP! PULL UP!");
-                            _commandSender.EmergencyStop(); // No "ok" response will be received, so app likely to hang if this happens
+                            Console.WriteLine("Probe triggered while moving into position, aborting...");
+                            //_commandSender.EmergencyStop(); // No "ok" response will be received, so app likely to hang if this happens
                             return;
                         }
                         else if (diff <= 0)
