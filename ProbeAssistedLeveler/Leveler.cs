@@ -25,6 +25,9 @@ namespace ProbeAssistedLeveler
         // An integer is used instead of a floating point value due to inaccuracies in floating point comparison
         private const int TargetDiff = 2;
 
+        // How many times to probe for each corner
+        private const int NumProbes = 3;
+
         // Order in which points are probed
         private static readonly List<string> ProbeOrder = new List<string> { "Bottom Left", "Bottom Right", "Top Right", "Top Left" };
 
@@ -143,6 +146,7 @@ namespace ProbeAssistedLeveler
 
         private int GetDiffAsInt(float current, float target)
         {
+            var foo = current - target;
             return Convert.ToInt32((current - target) * 100);
         }
 
@@ -153,9 +157,20 @@ namespace ProbeAssistedLeveler
             foreach (var corner in ProbeOrder)
             {
                 var coords = CornerCoords[corner];
-                Console.WriteLine($"Probing {corner}");
+                Console.WriteLine($"Probing {corner}...");
                 _commandSender.Move(moveMode: MoveMode.Absolute, x: coords.X, y: coords.Y, speed: FastMoveSpeed);
-                probeResults.Add(corner, new ProbeResult(corner, _commandSender.DoSingleProbe()));
+
+                var probeTotal = 0f;
+                for (var i = 0; i < NumProbes; i++)
+                {
+                    var probeValue = _commandSender.DoSingleProbe();
+                    probeTotal += probeValue;
+                    Console.WriteLine($"Probe value #{i + 1} = {probeValue}");
+                }
+
+                probeTotal /= NumProbes;
+                probeResults.Add(corner, new ProbeResult(corner, probeTotal));
+                Console.WriteLine($"Average: {probeTotal}\n");
             }
 
             // === Find lowest and highest values
