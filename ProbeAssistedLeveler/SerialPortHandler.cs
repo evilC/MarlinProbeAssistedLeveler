@@ -14,7 +14,7 @@ namespace ProbeAssistedLeveler
         private readonly SerialPort _port;
         private readonly AutoResetEvent _waitHandle;
         private volatile List<string> _response;
-        private static List<string> _ignoreLines = new List<string>
+        private static readonly List<string> IgnoreLines = new List<string>
         {
             string.Empty,
             "processing",
@@ -49,7 +49,7 @@ namespace ProbeAssistedLeveler
             while (_port.BytesToRead > 0)
             {
                 var line = _port.ReadLine();
-                if (_ignoreLines.Contains(line))
+                if (IgnoreLines.Contains(line))
                 {
                     continue;
                 }
