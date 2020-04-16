@@ -107,7 +107,7 @@ namespace ProbeAssistedLeveler
                     while (true)
                     {
                         var currentHeight = _commandSender.GetCurrentPosition().Z;
-                        diff = GetDiffAsInt(currentHeight, - baseZHeight);
+                        diff = GetDiffAsInt(currentHeight, baseZHeight);
                         if (_commandSender.IsProbeTriggered())
                         {
                             Console.WriteLine("Probe triggered while moving into position, aborting...");
