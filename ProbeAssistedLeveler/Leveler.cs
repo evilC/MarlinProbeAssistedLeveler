@@ -21,6 +21,10 @@ namespace ProbeAssistedLeveler
             {"Top Left", new Vector2(35, 210)}
         };
 
+        // Desired minimum difference expressed as an integer. 2 = 0.02mm
+        // An integer is used instead of a floating point value due to inaccuracies in floating point comparison
+        private const int TargetDiff = 2;
+
         // Order in which points are probed
         private static readonly List<string> ProbeOrder = new List<string> { "Bottom Left", "Bottom Right", "Top Right", "Top Left" };
 
@@ -70,63 +74,68 @@ namespace ProbeAssistedLeveler
             for (var i = 0; i < sortedCorners.Count() - 1; i++)
             {
                 var corner = sortedCorners[i];
-                Console.WriteLine($"Leveling {corner.CornerName}...");
-                var coords = CornerCoords[corner.CornerName];
-
-                // Move to corner X/Y and Safe Z height
-                _commandSender.Move(moveMode: MoveMode.Absolute, x: coords.X, y: coords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
-
-                // Deploy probe
-                _commandSender.ResetProbeAlarm();
-                Thread.Sleep(100);
-                _commandSender.RetractProbe();
-                Thread.Sleep(100);
-                _commandSender.DeployProbe();
-                Thread.Sleep(100);
-
                 var currentHeight = _commandSender.GetCurrentPosition().Z;
+                var diff = GetDiffAsInt(currentHeight, baseZHeight);
 
-                // Gradually move down and stop if the probe activates
-
-                // IsProbeTriggered() updates too slow to use relative move of 0.01 between each check :(
-
-                //while (Math.Abs(currentHeight - baseZHeight) > FloatTolerance)
-                //{
-                //    _commandSender.Move(moveMode: MoveMode.Relative, z: -0.01f, speed: FastMoveSpeed);
-                //    currentHeight = _commandSender.GetCurrentPosition().Z;
-                //    if (_commandSender.IsProbeTriggered())
-                //    {
-                //        break;
-                //    }
-                //}
-                
-                _commandSender.Move(moveMode: MoveMode.Absolute, z: baseZHeight, speed: SafeMoveSpeed, waitForFinish: false);
-                while (true)
+                if (diff >= TargetDiff)
                 {
-                    currentHeight = _commandSender.GetCurrentPosition().Z;
-                    var diff = (int)((currentHeight - baseZHeight) * 100);
-                    if (_commandSender.IsProbeTriggered())
-                    {
-                        Console.WriteLine("TOO LOW! PULL UP! PULL UP!");
-                        _commandSender.EmergencyStop(); // No "ok" response will be received, so app likely to hang if this happens
-                        return;
-                    }
-                    else if (diff <= 0)
-                    {
-                        break;
-                    }
-                }
+                    Console.WriteLine($"Leveling {corner.CornerName}...");
+                    var coords = CornerCoords[corner.CornerName];
 
-                if (Math.Abs(_commandSender.GetCurrentPosition().Z - baseZHeight) > FloatTolerance)
-                {
-                    throw new Exception("Probe triggered when trying to position");
-                }
+                    // Move to corner X/Y and Safe Z height
+                    _commandSender.Move(moveMode: MoveMode.Absolute, x: coords.X, y: coords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
 
-                Console.WriteLine($"Wind {corner.CornerName} knob until probe triggers");
-
-                while (!_commandSender.IsProbeTriggered())
-                {
+                    // Deploy probe
+                    _commandSender.ResetProbeAlarm();
                     Thread.Sleep(100);
+                    _commandSender.RetractProbe();
+                    Thread.Sleep(100);
+                    _commandSender.DeployProbe();
+                    Thread.Sleep(100);
+
+                    // Gradually move down and stop if the probe activates
+
+                    // IsProbeTriggered() updates too slow to use relative move of 0.01 between each check :(
+
+                    //while (Math.Abs(currentHeight - baseZHeight) > FloatTolerance)
+                    //{
+                    //    _commandSender.Move(moveMode: MoveMode.Relative, z: -0.01f, speed: FastMoveSpeed);
+                    //    currentHeight = _commandSender.GetCurrentPosition().Z;
+                    //    if (_commandSender.IsProbeTriggered())
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+
+                    _commandSender.Move(moveMode: MoveMode.Absolute, z: baseZHeight, speed: SafeMoveSpeed, waitForFinish: false);
+                    while (true)
+                    {
+                        currentHeight = _commandSender.GetCurrentPosition().Z;
+                        diff = (int)((currentHeight - baseZHeight) * 100);
+                        if (_commandSender.IsProbeTriggered())
+                        {
+                            Console.WriteLine("TOO LOW! PULL UP! PULL UP!");
+                            _commandSender.EmergencyStop(); // No "ok" response will be received, so app likely to hang if this happens
+                            return;
+                        }
+                        else if (diff <= 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (Math.Abs(_commandSender.GetCurrentPosition().Z - baseZHeight) > FloatTolerance)
+                    {
+                        throw new Exception("Probe triggered when trying to position");
+                    }
+
+                    Console.WriteLine($"Wind {corner.CornerName} knob until probe triggers");
+
+                    while (!_commandSender.IsProbeTriggered())
+                    {
+                        Thread.Sleep(100);
+                    }
+
                 }
 
                 Console.WriteLine($"{corner.CornerName} is leveled\n============\n");
@@ -134,6 +143,11 @@ namespace ProbeAssistedLeveler
 
             _commandSender.Move(moveMode: MoveMode.Absolute, x: homeCoords.X, y: homeCoords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
             Console.WriteLine("All corners leveled");
+        }
+
+        private int GetDiffAsInt(float current, float target)
+        {
+            return (int)((current - target) * 100);
         }
 
         private Dictionary<string, ProbeResult> GetProbeResults()
