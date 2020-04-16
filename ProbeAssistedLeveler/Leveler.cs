@@ -10,7 +10,7 @@ namespace ProbeAssistedLeveler
     {
         // === Start User configurable variables
         private const string ComPort = "COM8";
-        private const int BaudRate = 250000;
+        private const int BaudRate = 115200;
 
         // Edit this with the coords of the corners to probe
         private static readonly Dictionary<string, Vector2> CornerCoords = new Dictionary<string, Vector2>
