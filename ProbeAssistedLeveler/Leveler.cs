@@ -74,7 +74,7 @@ namespace ProbeAssistedLeveler
                 var coords = CornerCoords[corner.CornerName];
 
                 // Move to corner X/Y and Safe Z height
-                _commandSender.Move(moveMode: MoveMode.Absolute, x: coords.X, y: coords.Y, homeCoords.Z, speed: FastMoveSpeed);
+                _commandSender.Move(moveMode: MoveMode.Absolute, x: coords.X, y: coords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
 
                 // Deploy probe
                 _commandSender.ResetProbeAlarm();
