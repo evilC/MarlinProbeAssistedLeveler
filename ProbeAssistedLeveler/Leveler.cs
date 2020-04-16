@@ -120,11 +120,6 @@ namespace ProbeAssistedLeveler
                         }
                     }
 
-                    if (Math.Abs(_commandSender.GetCurrentPosition().Z - baseZHeight) > FloatTolerance)
-                    {
-                        throw new Exception("Probe triggered when trying to position");
-                    }
-
                     Console.WriteLine($"Wind {corner.CornerName} knob until probe triggers");
 
                     while (!_commandSender.IsProbeTriggered())
