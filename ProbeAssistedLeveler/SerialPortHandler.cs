@@ -27,6 +27,7 @@ namespace ProbeAssistedLeveler
             _port = new SerialPort(port, baudRate);
             _port.DataReceived += OnDataReceived;
             _port.Open();
+            _port.ReadExisting(); // clear buffer
         }
 
         public void Dispose()
