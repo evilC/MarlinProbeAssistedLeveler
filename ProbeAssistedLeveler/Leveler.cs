@@ -78,8 +78,11 @@ namespace ProbeAssistedLeveler
 
                 // Deploy probe
                 _commandSender.ResetProbeAlarm();
+                Thread.Sleep(100);
                 _commandSender.RetractProbe();
+                Thread.Sleep(100);
                 _commandSender.DeployProbe();
+                Thread.Sleep(100);
 
                 var currentHeight = _commandSender.GetCurrentPosition().Z;
 
