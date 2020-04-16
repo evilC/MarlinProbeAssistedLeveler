@@ -136,7 +136,7 @@ namespace ProbeAssistedLeveler
             }
 
             _commandSender.Move(moveMode: MoveMode.Absolute, x: homeCoords.X, y: homeCoords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
-            Console.WriteLine("All corners leveled");
+            Console.WriteLine("\nAll corners leveled");
         }
 
         private int GetDiffAsInt(float diff)
