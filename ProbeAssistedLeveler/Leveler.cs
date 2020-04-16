@@ -49,6 +49,7 @@ namespace ProbeAssistedLeveler
         public void LevelBed()
         {
             // === Auto Home and get home coords
+            Console.WriteLine("Auto Homing\n");
             var homeCoords = _commandSender.AutoHome();
             //var homeCoords = new Vector3(138.0f, 140.0f, 12.75f);
             var zOffset = _commandSender.GetProbeZOffset();
@@ -56,29 +57,24 @@ namespace ProbeAssistedLeveler
             var probeResults = GetProbeResults();
             var sortedCorners = SortProbeResults(probeResults);
 
-            _commandSender.Move(moveMode:MoveMode.Absolute, x: homeCoords.X, y: homeCoords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
-
-            Console.WriteLine("Corner Diffs:");
+            Console.WriteLine("\nCorner Diffs:");
             foreach (var corner in sortedCorners)
             {
                 Console.WriteLine($"{corner.CornerName} {corner.Diff}");
             }
 
+            Console.WriteLine();
+
             // Work out at what height the probe triggered for the highest point
             // This will be the reported Z value for the highest probe, plus the INVERSE (* -1) of the Z offset as set in M851 / PROBE_TO_NOZZLE_OFFSET
             // 
             var baseZHeight = sortedCorners.Last().Z + (zOffset * -1);
-            //Console.WriteLine($"Leveling all corners to Z = {baseZHeight}...");
-            //return;
-
             for (var i = 0; i < sortedCorners.Count() - 1; i++)
             {
                 var corner = sortedCorners[i];
-                var currentHeight = _commandSender.GetCurrentPosition().Z;
-                var diff = GetDiffAsInt(currentHeight, baseZHeight);
-
-                if (diff >= TargetDiff)
-                {
+                var diff = GetDiffAsInt(corner.Diff);
+                if (diff > TargetDiff)
+                { 
                     Console.WriteLine($"Leveling {corner.CornerName}...");
                     var coords = CornerCoords[corner.CornerName];
 
@@ -110,8 +106,8 @@ namespace ProbeAssistedLeveler
                     _commandSender.Move(moveMode: MoveMode.Absolute, z: baseZHeight, speed: SafeMoveSpeed, waitForFinish: false);
                     while (true)
                     {
-                        currentHeight = _commandSender.GetCurrentPosition().Z;
-                        diff = (int)((currentHeight - baseZHeight) * 100);
+                        var currentHeight = _commandSender.GetCurrentPosition().Z;
+                        diff = GetDiffAsInt(currentHeight, - baseZHeight);
                         if (_commandSender.IsProbeTriggered())
                         {
                             Console.WriteLine("TOO LOW! PULL UP! PULL UP!");
@@ -138,16 +134,21 @@ namespace ProbeAssistedLeveler
 
                 }
 
-                Console.WriteLine($"{corner.CornerName} is leveled\n============\n");
+                Console.WriteLine($"{corner.CornerName} is leveled\n");
             }
 
             _commandSender.Move(moveMode: MoveMode.Absolute, x: homeCoords.X, y: homeCoords.Y, z: homeCoords.Z, speed: FastMoveSpeed);
             Console.WriteLine("All corners leveled");
         }
 
+        private int GetDiffAsInt(float diff)
+        {
+            return Convert.ToInt32(diff * 100);
+        }
+
         private int GetDiffAsInt(float current, float target)
         {
-            return (int)((current - target) * 100);
+            return Convert.ToInt32((current - target) * 100);
         }
 
         private Dictionary<string, ProbeResult> GetProbeResults()
@@ -157,6 +158,7 @@ namespace ProbeAssistedLeveler
             foreach (var corner in ProbeOrder)
             {
                 var coords = CornerCoords[corner];
+                Console.WriteLine($"Probing {corner}");
                 _commandSender.Move(moveMode: MoveMode.Absolute, x: coords.X, y: coords.Y, speed: FastMoveSpeed);
                 probeResults.Add(corner, new ProbeResult(corner, _commandSender.DoSingleProbe()));
             }
